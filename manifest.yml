@@ -1,0 +1,10 @@
+applications:
+- path: .
+  memory: 128M
+  instances: 3
+  domain: mybluemix.net
+  name: jsonata
+  host: jsonata
+  disk_quota: 1024M
+  services:
+  - Cloudant-JSONata

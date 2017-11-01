@@ -1,0 +1,7 @@
+node_modules/
+public/scripts/bundle.js
+public/scripts/jsonata
+npm-debug.log
+coverage
+.idea/
+.DS_Store

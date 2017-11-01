@@ -1,0 +1,97 @@
+<!--
+* © Copyright IBM Corp. 2016, 2017 All Rights Reserved
+*   Project name: JSONata
+*   This project is licensed under the MIT License, see LICENSE
+-->
+
+<html>
+  <head>
+    <title>JSONata Exerciser</title>
+    <link rel="icon" type="image/png" href="images/jsonata-button.png" />
+    <script src="https://unpkg.com/jsonata/jsonata.min.js"></script>
+    <script src="/codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" type="text/css" href="/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/codemirror/addon/hint/show-hint.css">
+    <script src="/codemirror/addon/edit/closebrackets.js"></script>
+    <script src="/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="/codemirror/addon/hint/show-hint.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/exerciser.css">
+    <script src="/codemirror/mode/javascript/javascript.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="scripts/bundle.js"></script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+  </head>
+
+  <body>
+    <!--div class="header">
+      <h1>Path Exerciser</h1>
+    </div-->
+
+    <div id="banner">
+      <div id="logo"><img src="images/JSONata-white-38.png"></div>
+      <div id="banner1" class="bannerpart">JSONata Exerciser</div>
+      <div id="banner2" class="bannerpart">
+        <button id="data1">Invoice</button>
+        <button id="data2">Address</button>
+        <button id="data3">Schema</button>
+        <button id="data4" class="template">Template</button>
+      </div>
+      <div id="banner3" class="bannerpart">
+        <form id="mode" class="template">
+          <input type="radio" name="mode" id="mode1" value="Expression" checked><label>Expression</label>
+          <input type="radio" name="mode" id="mode2" value="Literal"><label>Literal</label>
+        </form>
+      </div>
+      <div id="banner4" class="bannerpart"><p>
+        <a href="#share" style="visibility: <%= sharable %>"><img src="images/share.svg" alt="Save and Share"></a>
+        <a href="http://docs.jsonata.org"><img src="images/docs-white-32.png" alt="Documentation"></a>
+        <a href="http://twitter.com/intent/tweet?status=JSONata:  The JSON query and transformation language.+http://jsonata.org"><img id="t-icon" src="images/twitter-white.png"></a>
+        <a href="http://stackoverflow.com/search?q=JSONata"><img src="images/so-white-32.png"></a>
+        <a href="https://github.com/jsonata-js/jsonata"><img src="images/GitHub-Mark-Light-32px.png"></a>
+      </p> </div>
+    </div>
+    <div class="content">
+      <div id="srcdiv" class="src split split-horizontal">
+        <textarea id="source"><%= input %></textarea>
+        <div id="json-label" class="label">JSON</div>
+        <img src="images/format.png" id="json-format" title="Format">
+      </div>
+      <div id="rhsdiv" class="rhs split split-horizontal">
+        <div class="pth split content" id="pthdiv">
+          <textarea id="path"><%= jsonata %></textarea>
+          <div id="jsonata-label" class="label">JSONata</div>
+          <div id="version-label" class="label"></div>
+        </div>
+        <div class="res split content" id="resdiv">
+          <textarea id="result"></textarea>
+          <div id="result-label" class="label">Result</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="share" class="modalDialog">
+      <div>	<a href="#close" title="Close" class="close">&times;</a>
+        <h2 id="share-title">Save expression</h2>
+        <p id="share-msg">Save and share your JSONata expression.</p>
+        <p class="verify">Please check the box below to get a URL to your saved expression...</p>
+        <div class="g-recaptcha verify" data-callback="recaptchaCallback" data-sitekey="<%= recapture_sitekey %>"></div>
+      </div>
+    </div>
+
+  </body>
+
+  <script src="https://unpkg.com/split.js/split.min.js"></script>
+  <script>
+    Split(['#srcdiv', '#rhsdiv'], {
+      gutterSize: 5,
+      cursor: 'col-resize'
+    });
+
+    Split(['#pthdiv', '#resdiv'], {
+      direction: 'vertical',
+      sizes: [25, 75],
+      gutterSize: 5,
+      cursor: 'row-resize'
+    });
+    </script>
+</html>
