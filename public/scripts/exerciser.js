@@ -11,6 +11,7 @@ var jsonataResult;
 var jsonataError;
 
 var jsonataVersions = {
+    '1.5.0': 'v1.5.0',
     '1.4.1': 'v1.4.1',
     '1.4.0': 'v1.4.0',
     '1.3.3': 'v1.3.3',
