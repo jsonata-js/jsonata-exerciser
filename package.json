@@ -33,7 +33,7 @@
     "shortid": "^2.2.8"
   },
   "devDependencies": {
-    "browserify": "^15.2.0"
+    "browserify": "^16.2.2"
   },
   "engines": {
   	"node": "6.x"
