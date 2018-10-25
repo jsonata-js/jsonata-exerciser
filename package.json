@@ -36,6 +36,6 @@
     "browserify": "^16.2.2"
   },
   "engines": {
-  	"node": "6.x"
+    "node": "6.x"
   }
 }
