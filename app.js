@@ -7,8 +7,9 @@ var express = require('express'),
     request = require('request'),
     querystring = require('querystring'),
     path = require('path'),
-    shortid = require('shortid');
-    fs = require('fs');
+    shortid = require('shortid'),
+    fs = require('fs'),
+    jsonata = require('jsonata');
 
 var app = express();
 
@@ -107,6 +108,24 @@ app.get('/', function(req, res) {
     res.render('index.html', inserts);
 });
 
+app.get('/versions', function(req, res) {
+    var url = 'https://registry.npmjs.org/jsonata';
+    request({
+        url: url,
+        method: 'GET'
+    }, function (error, response, body) {
+        if (error) {
+            console.log(error);
+            res.status(500).send(error.message);
+        } else {
+            var json = JSON.parse(body);
+            //var tags = jsonata('(versions ~> $keys() ~> $reverse()).("v" & $)').evaluate(json);
+            var tags = jsonata('((versions~>$keys()~>$reverse()).$match(/(.+\\..+)\\.(.+)/){groups[0]:"v"&(match)[0]}).*').evaluate(json);
+            res.status(200).send({'releases': tags});
+        }
+    });
+});
+
 if(db) {
     app.get('/:id', function (req, res) {
         db.get(req.params.id, function (err, doc) {
@@ -189,6 +208,69 @@ app.post('/data', function(req, res) {
     };
     res.render('index.html', inserts);
 });
+
+app.post('/slack', function(req, res) {
+    humansOnly(req, res, function() {
+        // register with slack
+        var email = req.body.email;
+        var token = process.env.SLACK_TOKEN || 'default';
+        var url = 'https://slack.com/api/users.admin.invite';
+        request({
+            url: url,
+            method: 'GET',
+            qs: {
+                token: token,
+                email: email
+            }
+        }, function (error, response, body) {
+            if (error) {
+                console.log(error);
+                res.status(500).send(error.message);
+            } else {
+                var json = JSON.parse(body);
+                if(json.ok === true) {
+                    res.status(201).send();
+                } else {
+                    res.status(200).send(json.error);
+                }
+            }
+        });
+    });
+});
+
+function humansOnly(req, res, callback) {
+    // first check with the reCaptcha service
+    var recap_body = querystring.stringify({
+        secret: recaptureCredentials.secret,
+        response: req.body.recaptcha,
+        remoteip: req.connection.remoteAddress
+    });
+
+    request({
+        url: 'https://www.google.com/recaptcha/api/siteverify',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(recap_body)
+        },
+        body: recap_body
+    }, function (error, response, body) {
+        if (error) {
+            console.log(error);
+            res.status(500).send(error.message);
+        } else {
+            var recap_body = JSON.parse(body);
+            if (recap_body.success === true) {
+                // not a robot!
+                callback();
+            } else {
+                // failed the reCaptcha challenge
+                res.status(400).send('Failed the robot challenge!');
+            }
+        }
+    });
+
+}
 
 http.createServer(app).listen(app.get('port'), '0.0.0.0', function() {
     console.log('Express server listening on port ' + app.get('port'));
