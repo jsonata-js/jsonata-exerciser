@@ -71,24 +71,30 @@ body {
     padding-right: 10px;
 }
 
-#banner2 {
-    transform: unset;
+#banner3 {
+    text-align: right;
 }
 
-#banner3 a:link {
-    color: snow;
+#banner3 select {
+    font-family: "Source Sans Pro",  sans-serif;
+    font-weight: lighter;
+    color: white;
+    background: transparent;
+    border-width: 1px;
+    border-color: white;
+    font-size: smaller;
+    height: 25px;
+    padding: 5px; /* If you add too much padding here, the options won't show in IE */
+    width: 100px;
 }
 
-#banner3 a:visited {
-    color: snow;
-}
-
-#banner4 p {
+#banner4 {
     text-align: right;
 }
 
 #banner4 img {
-    height: 25px;
+    height: 23px;
+    padding-top: 2px;
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -125,7 +131,7 @@ body {
 }
 
 #version-label {
-    top: 40px;
+    top: 45px;
     font-size: small;
 }
 
@@ -135,6 +141,18 @@ body {
     right: 20px;
     height: 17px;
     z-index: 10;
+}
+
+#sample-data, #version-select {
+    position: absolute;
+    top: 45px;
+    right: 20px;
+    height: 20px;
+    z-index: 10;
+}
+
+#version-select {
+    right: 40px;
 }
 
 .res {
@@ -248,9 +266,17 @@ body {
     float: left;
 }
 
+input {
+    font-family: "Source Sans Pro",  sans-serif;
+    font-weight: lighter;
+    font-size: medium;
+    width: 100%;
+}
+
 .modalDialog {
     position: fixed;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Source Sans Pro",  sans-serif;
+    font-weight: lighter;
     top: 0;
     right: 0;
     bottom: 0;

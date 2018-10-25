@@ -23,6 +23,12 @@ var jsonataVersions = {
     'local': 'local'
 };
 
+var sampleData = {
+    Invoice: data1,
+    Address: data2,
+    Schema: data3
+}
+
 window.onload = function () {
     default_text = document.getElementById('source').value || '';
 
@@ -40,8 +46,12 @@ window.onload = function () {
         },
         matchBrackets: true,
         extraKeys: {
-            F12: function (cm) {  // F12 shortcut for lambda λ
+            F11: function (cm) {  // F11 shortcut for lambda λ
                 cm.replaceSelection('\u03BB');
+            },
+            F7: function() {
+                loadJSONata('local');
+                document.getElementById("version-select").style.display = 'none';
             }
         },
         viewportMargin: Infinity
@@ -68,10 +78,6 @@ window.onload = function () {
 
     timer = setTimeout(eval, 500);
 
-    document.getElementById("data1").onclick = data1;
-    document.getElementById("data2").onclick = data2;
-    document.getElementById("data3").onclick = data3;
-
     document.getElementById("json-format").onclick = function() {
         var str = source.getValue();
         str = JSON.parse(str);
@@ -79,12 +85,45 @@ window.onload = function () {
         source.setValue(str);
     };
 
-    window.recaptchaCallback = function(resp) {
+    window.selectData = function(selection) {
+        console.log(selection.value);
+        sampleData[selection.value]();
+    };
+
+    window.selectVersion = function(selection) {
+        console.log(selection.value);
+        loadJSONata(selection.value, false);
+        timer = setTimeout(eval, 500);
+    };
+
+    window.saveCallback = function(resp) {
         save(resp);
+    };
+
+    window.slackCallback = function(resp) {
+        slack(resp);
     };
 
     $(window).on('hashchange', function(e){
         window.history.pushState("", document.title, window.location.pathname);
+    });
+
+    $.ajax({
+        type:'GET',
+        url: '/versions',
+        contentType: 'application/json',
+        success: function(data, status, jqXHR) {
+            if(jqXHR.status === 200) {
+                console.log(data, typeof data);
+                data.releases.forEach(function(tag) {
+                    var select = document.getElementById('version-select');
+                    var option = document.createElement("option");
+                    option.text = tag;
+                    option.value = tag;
+                    select.add(option);
+                })
+            }
+        }
     });
 
 };
@@ -231,7 +270,7 @@ function evalJsonata(input) {
        console.log(arg);
     });
 
-    //timeboxExpression(expr, 1000, 500);
+    timeboxExpression(expr, 1000, 500);
 
     var pathresult = expr.evaluate(input);
     if (typeof pathresult === 'undefined') {
@@ -279,8 +318,37 @@ function save(resp) {
                 document.getElementsByClassName("verify")[0].style.display = 'none';
                 document.getElementsByClassName("verify")[1].style.display = 'none';
             }
-            console.log(status, data, jqXHR.getResponseHeader('location'));
         }
+    });
+}
+
+function slack(resp) {
+    // post the input data and jsonata
+    var email;
+    try {
+        email = document.getElementById("slack-email").value;
+        console.log(email)
+    } catch(err) {}
+    var body = {
+        email: email,
+        recaptcha: resp
+    };
+    $.ajax({
+        type:'POST',
+        url: '/slack',
+        data: JSON.stringify(body),
+        contentType: 'application/json',
+        success: function(data, status, jqXHR) {
+            if(jqXHR.status === 201) {
+                // created
+                document.getElementById("slack-title").innerHTML = 'Invitation sent!';
+                document.getElementsByClassName("verify")[0].style.display = 'none';
+                document.getElementsByClassName("verify")[1].style.display = 'none';
+            } else {
+                console.log(data);
+                document.getElementById("slack-title").innerHTML = data;
+            }
+        },
     });
 }
 
