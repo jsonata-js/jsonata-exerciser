@@ -8,7 +8,6 @@
   <head>
     <title>JSONata Exerciser</title>
     <link rel="icon" type="image/png" href="images/jsonata-button.png" />
-    <script src="https://unpkg.com/jsonata/jsonata.min.js"></script>
     <script src="/codemirror/lib/codemirror.js"></script>
     <link rel="stylesheet" type="text/css" href="/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="/codemirror/addon/hint/show-hint.css">
@@ -27,7 +26,8 @@
     <link rel="stylesheet" type="text/css" href="style/exerciser.css">
     <script src="/codemirror/mode/javascript/javascript.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="scripts/bundle.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/jsonata/jsonata.min.js"></script>
+    <script defer src="scripts/bundle.js"></script>
     <script type="text/javascript">
         var save_recaptcha;
         var slack_recaptcha;
@@ -108,21 +108,22 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm//split.js/split.min.js"></script>
+    <script>
+        Split(['#srcdiv', '#rhsdiv'], {
+            gutterSize: 5,
+            cursor: 'col-resize'
+        });
+
+        Split(['#pthdiv', '#resdiv'], {
+            direction: 'vertical',
+            sizes: [25, 75],
+            gutterSize: 5,
+            cursor: 'row-resize'
+        });
+    </script>
+
     <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
   </body>
 
-  <script src="https://unpkg.com/split.js/split.min.js"></script>
-  <script>
-    Split(['#srcdiv', '#rhsdiv'], {
-      gutterSize: 5,
-      cursor: 'col-resize'
-    });
-
-    Split(['#pthdiv', '#resdiv'], {
-      direction: 'vertical',
-      sizes: [25, 75],
-      gutterSize: 5,
-      cursor: 'row-resize'
-    });
-    </script>
 </html>

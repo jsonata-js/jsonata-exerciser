@@ -137,12 +137,14 @@ function loadJSONata(version, isBranch)
     if(version === 'local') {
         script.src = 'scripts/jsonata/jsonata.js';
         label.innerHTML = '** Local **';
+        this.local = true;
     } else if(isBranch) {
         script.src = 'https://rawgit.com/jsonata-js/jsonata/' + version + '/jsonata.js';
         label.innerHTML = '** ' + version + ' **';
     } else {
-        script.src = 'https://unpkg.com/jsonata@' + version + '/jsonata.min.js';
+        script.src = 'https://cdn.jsdelivr.net/npm/jsonata@' + version + '/jsonata.min.js';
         label.innerHTML = version;
+        this.local = false;
     }
     head.appendChild(script);
 }
@@ -270,7 +272,9 @@ function evalJsonata(input) {
        console.log(arg);
     });
 
-    timeboxExpression(expr, 1000, 500);
+    if(!this.local) {
+        timeboxExpression(expr, 1000, 500);
+    }
 
     var pathresult = expr.evaluate(input);
     if (typeof pathresult === 'undefined') {
