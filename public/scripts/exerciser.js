@@ -4,8 +4,11 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-var moment = require('moment');
-var jsonataMode = require('./cm-jsonata.js');
+var moment;
+if(!window) {
+    moment = require('moment');
+    require('./cm-jsonata.js');
+}
 var errorMark;
 var jsonataResult;
 var jsonataError;
