@@ -1,0 +1,89 @@
+<!--
+* © Copyright IBM Corp. 2016, 2017 All Rights Reserved
+*   Project name: JSONata
+*   This project is licensed under the MIT License, see LICENSE
+-->
+
+<html>
+  <head>
+    <title>JSONata Exerciser</title>
+    <link rel="icon" type="image/png" href="public/images/jsonata-button.png" />
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/lib/codemirror.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/lib/codemirror.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/hint/show-hint.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/edit/closebrackets.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/edit/matchbrackets.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/hint/show-hint.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/search.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/dialog/dialog.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/searchcursor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/search.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/scroll/annotatescrollbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/matchesonscrollbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/jump-to-line.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/dialog/dialog.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/addon/search/matchesonscrollbar.css">
+    <link rel="stylesheet" type="text/css" href="public/style/exerciser.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.42.0/mode/javascript/javascript.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsonata/jsonata.min.js"></script>
+    <script src="public/scripts/cm-jsonata.js"></script>
+    <script src="public/scripts/exerciser.js"></script>
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="logo"><a href="http://jsonata.org"><img src="public/images/JSONata-white-38.png"></a></div>
+      <div id="banner1" class="bannerpart">JSONata Exerciser</div>
+      <div id="banner2" class="bannerpart">&nbsp;</div>
+      <div id="banner3" class="bannerpart">&nbsp;</div>
+      <div id="banner4" class="bannerpart">
+        <a href="http://docs.jsonata.org"><img src="public/images/docs-white-32.png" alt="Documentation"></a>
+        <a href="http://twitter.com/intent/tweet?status=JSONata:  The JSON query and transformation language.+http://jsonata.org"><img id="t-icon" src="public/images/twitter-white.png"></a>
+        <a href="http://stackoverflow.com/search?q=JSONata"><img src="public/images/so-white-32.png"></a>
+        <a href="https://github.com/jsonata-js/jsonata"><img src="public/images/GitHub-Mark-Light-32px.png"></a>
+      </div>
+    </div>
+    <div class="content">
+      <div id="srcdiv" class="src split split-horizontal">
+        <textarea id="source">{"test": "data"}</textarea>
+        <div id="json-label" class="label">JSON</div>
+        <img src="public/images/format.png" id="json-format" title="Format">
+        <select id="sample-data" onchange="window.selectData(this);">
+          <option value="Invoice">Invoice</option>
+          <option value="Address">Address</option>
+          <option value="Schema">Schema</option>
+        </select>
+      </div>
+      <div id="rhsdiv" class="rhs split split-horizontal">
+        <div class="pth split content" id="pthdiv">
+          <textarea id="path">test</textarea>
+          <div id="jsonata-label" class="label">JSONata</div>
+          <select id="version-select" onchange="window.selectVersion(this);"></select>
+          <div id="version-label" class="label"></div>
+        </div>
+        <div class="res split content" id="resdiv">
+          <textarea id="result"></textarea>
+          <div id="result-label" class="label">Result</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm//split.js/split.min.js"></script>
+    <script>
+        Split(['#srcdiv', '#rhsdiv'], {
+            gutterSize: 5,
+            cursor: 'col-resize'
+        });
+
+        Split(['#pthdiv', '#resdiv'], {
+            direction: 'vertical',
+            sizes: [25, 75],
+            gutterSize: 5,
+            cursor: 'row-resize'
+        });
+    </script>
+
+  </body>
+
+</html>
