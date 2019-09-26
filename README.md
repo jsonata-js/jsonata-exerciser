@@ -35,5 +35,9 @@ It is possible to load different versions of JSONata by typing the following com
 `J:use 1.3.1`
 to load version 1.3.1 which was published to [npm](http://npmjs.com/jsonata)
 
-It is also possible to load a development branch from GitHub using (e.g.):
-`J:branch my_branch`
+## Running against a local version of JSONata
+
+To use a local, modified, version of JSONata with the exerciser (for example, when experimenting with changes):
+- Clone [JSONata](https://github.com/jsonata-js/jsonata), change into the directory and run `npm install` and `npm run prePublishOnly` to install dependencies and build it
+- Run `npm link` in the same directory, then switch to the exerciser directory and run `npm link jsonata`
+- In the JSONata input box type the following command to use your local version of JSONata: `J:use local`
