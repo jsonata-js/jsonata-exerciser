@@ -25,11 +25,6 @@ Modal.setAppElement('#root');
 const recaptchaRef = React.createRef();
 const baseUri = 'https://c40c296d.us-south.apigw.appdomain.cloud/api/';
 
-function onSubmit() {
-    const recaptchaValue = recaptchaRef.current.getValue();
-    this.props.onSubmit(recaptchaValue);
-}
-
 const customStyles = {
     content : {
         top                   : '50%',
@@ -80,6 +75,9 @@ class Exerciser extends React.Component {
           .then(
             result => {
                 console.log(result);
+                if(process.env.NODE_ENV === 'development') {
+                    result.versions.unshift('local')
+                }
                 const select = document.getElementById('version-select');
                 result.versions.forEach(function(tag) {
                     const option = document.createElement("option");
@@ -191,7 +189,7 @@ class Exerciser extends React.Component {
         const label = document.getElementById('version-label');
         script.type= 'text/javascript';
         if(version === 'local') {
-            script.src = 'jsonata.js';
+            script.src = 'http://localhost:3009/jsonata.js';
             label.innerHTML = '** Local **';
             this.local = true;
         } else if(isBranch) {
@@ -320,6 +318,7 @@ class Exerciser extends React.Component {
         const checkRunnaway = function() {
             if(depth > maxDepth) {
                 // stack too deep
+                // eslint-disable-next-line  no-throw-literal
                 throw {
                     code: 'U1001',
                     message: 'Stack overflow error: Check for non-terminating recursive function.  Consider rewriting as tail-recursive.',
@@ -328,6 +327,7 @@ class Exerciser extends React.Component {
             }
             if(Date.now() - time > timeout) {
                 // expression has run for too long
+                // eslint-disable-next-line  no-throw-literal
                 throw {
                     code: 'U1002',
                     message: "Expression evaluation timeout: Check for infinite loop",
@@ -442,7 +442,7 @@ class Exerciser extends React.Component {
                         <a
                           href="http://twitter.com/intent/tweet?status=JSONata:  The JSON query and transformation language.+http://jsonata.org"><img
                           id="t-icon" src={twitter} alt={"Twitter"}/></a>
-                        <a href="#slack" onClick={this.handleOpenSlackModal.bind(this)}><img src={slack} alt="Join us on Slack"/></a>
+                        <a href="#slack" onClick={this.handleOpenSlackModal.bind(this)}><img src={slack} alt={"Join us on Slack"}/></a>
                         <a href="http://stackoverflow.com/search?q=JSONata"><img src={stackoverflow} alt={"StackOverflow"}/></a>
                         <a href="https://github.com/jsonata-js/jsonata"><img src={github} alt={"GitHub"}/></a>
                     </div>

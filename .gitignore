@@ -1,6 +1,9 @@
 node_modules/
-public/scripts/bundle.js
-public/scripts/jsonata
+build/
+serverless/prepare-insert/node_modules/
+serverless/prepare-insert/dist/
+serverless/slack-invite/node_modules/
+serverless/slack-invite/dist/
 npm-debug.log
 coverage
 .idea/

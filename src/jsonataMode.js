@@ -35,7 +35,7 @@ function registerJsonata(monaco) {
         surroundingPairs: brackets,
         indentationRules: {
             // ^(.*\*/)?\s*\}.*$
-            decreaseIndentPattern: /^((?!.*?\/\*).*\*\/)?\s*[\}\]\)].*$/,
+            decreaseIndentPattern: /^((?!.*?\/\*).*\*\/)?\s*[}\])].*$/,
             // ^.*\{[^}"']*$
             increaseIndentPattern: /^((?!\/\/).)*(\{[^}"'`]*|\([^)"'`]*|\[[^\]"'`]*)$/
         },
