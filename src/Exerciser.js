@@ -19,6 +19,8 @@ import github from './images/GitHub-Mark-Light-32px.png';
 import ReCAPTCHA from "react-google-recaptcha";
 import Modal from 'react-modal';
 import jsonataMode from './jsonataMode';
+import jsonparse from './json-parse';
+import Highlighter from './highlighters';
 
 Modal.setAppElement('#root');
 
@@ -37,6 +39,11 @@ const customStyles = {
         background            :  '-webkit-linear-gradient(#fff, #999)'
     }
 };
+
+let debugEvents = [];
+let debugInputIndex = [];
+let debugResultsIndex = [];
+let debugEventGroups = new Map();
 
 class Exerciser extends React.Component {
     constructor(props) {
@@ -74,7 +81,6 @@ class Exerciser extends React.Component {
           .then(res => res.json())
           .then(
             result => {
-                console.log(result);
                 if(process.env.NODE_ENV === 'development') {
                     result.versions.unshift('local')
                 }
@@ -92,7 +98,6 @@ class Exerciser extends React.Component {
             }
           );
 
-        console.log(this.props.data);
         if(this.props.data) {
             this.setState({json: 'Loading...', jsonata: 'Loading...'});
             // load the data
@@ -100,7 +105,6 @@ class Exerciser extends React.Component {
               .then(res => res.json())
               .then(
                 result => {
-                    console.log(result);
                     this.setState({
                         json: JSON.stringify(result.json, null, 2),
                         jsonata: result.jsonata,
@@ -121,17 +125,18 @@ class Exerciser extends React.Component {
     }
 
     jsonEditorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
-        this.jsonEditor = editor;
-        editor.decorations = [];
         //editor.focus();
+        this.inputHighligher = new Highlighter(editor, monaco, () => this.state.json, 'jsonataDebugMarker', 'jsonataDebugMargin');
+        this.inputErrorHighligher = new Highlighter(editor, monaco, () => this.state.json, 'jsonataErrorMarker', 'jsonataErrorMargin');
+        editor.onMouseDown(this.inputDebugHandler.bind(this));
     }
 
     jsonataEditorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
         this.monaco = monaco;
-        this.jsonataEditor = editor;
-        editor.decorations = [];
+        this.expressionEditor = editor;
+        editor.focus();
+        this.expressionHighligher = new Highlighter(editor, monaco, () => this.state.jsonata, 'jsonataDebugMarker', 'jsonataDebugMargin');
+        this.expressionErrorHighligher = new Highlighter(editor, monaco, () => this.state.jsonata, 'jsonataErrorMarker', 'jsonataErrorMargin');
 
         editor.addAction({
             id: 'jsonata-lambda',
@@ -152,11 +157,256 @@ class Exerciser extends React.Component {
                 return null;
             }
         });
+        editor.onMouseDown(this.expressionDebugHandler.bind(this));
+        editor.onMouseMove(this.expressionMouseMoveHandler.bind(this));
+        this.expressionMousePosition = {};
+
+        // monaco.languages.registerHoverProvider('jsonata', {
+        //     provideHover: this.jsonataHoverProvider.bind(this)
+        // });
+    }
+
+    resultsEditorDidMount(editor, monaco) {
+        this.resultsHighligher = new Highlighter(editor, monaco, () => this.state.result, 'jsonataDebugMarker', 'jsonataDebugMargin');
+        editor.onMouseDown(this.resultsDebugHandler.bind(this));
+    }
+
+    inputDebugHandler(event) {
+        const position = event.target.position;
+        const index = this.positionToIndex(position, this.state.json);
+        this.clearMarkers();
+        // find and highlight it in the input pane
+        for(let i = 0; i < debugInputIndex.length; i++) {
+            const item = debugInputIndex[i];
+            if (index >= item.start && index <= item.end) {
+                this.highlightSourceAndTargetById(i);
+                this.highlightExpressionById(i);
+                break;
+            }
+        }
+    }
+
+    highlightSourceAndTargetById(id) {
+        const item = debugInputIndex[id];
+        if(item) {
+            this.inputHighligher.addMarker(item.start, item.end);
+        }
+        // find and highlight all occurrences of this value in the results pane
+        debugResultsIndex.filter(res => res.sourceId === id).forEach(res => {
+            this.resultsHighligher.addMarker(res.target.start, res.target.end);
+        });
+    }
+
+    highlightExpressionById(id) {
+        for (let i = 0; i < debugEvents.length; i++) {
+            const item = debugEvents[i];
+            if(item.result._jsonata_id === id) {
+                this.expressionHighligher.addMarker(item.position.start, item.position.end);
+            }
+        }
+    }
+
+    expressionDebugHandler(event) {
+        console.log(event.target);
+        const position = event.target.position;
+        if(position && event.target.type === 6) {
+            const index = this.positionToIndex(position, this.state.jsonata) + 1;
+            this.clearMarkers();
+            this.debugExpressionList = Array.from(debugEventGroups.keys())
+              .filter(expr => expr.span && index >= expr.span.start && index <= expr.span.end)
+              .sort((a, b) => (a.span.end - a.span.start) - (b.span.end - b.span.start));
+
+            const content = `
+<div id="accordion">${ 
+                this.debugExpressionList.map((expr, i) => {
+                    return `
+     <div class="panel">
+          <div class="header debugExpr" id="expr${i}">${this.state.jsonata.substring(expr.span.start, expr.span.end)}</div>
+          <div class="body"><ul>${
+                        debugEventGroups.get(expr).map(item => `<li id="res${item.result._jsonata_id}">${JSON.stringify(item.result)}</li>`).join('')
+                    }
+          </ul></div>
+     </div>`
+                 }).join('')}
+</div>`;
+
+            //when panel is clicked, handlePanelClick is called.
+            function handlePanelClick(event){
+                showPanel(event.currentTarget);
+            }
+
+            //Hide currentPanel and show new panel.
+            function showPanel(panel){
+                //Hide current one. First time it will be null.
+                const accordionElem = document.getElementById("accordion");
+                var expandedPanel = accordionElem.querySelector(".active");
+                if (expandedPanel){
+                    expandedPanel.classList.remove("active");
+                }
+
+                //Show new one
+                panel.classList.add("active");
+
+            }
+
+            function initAccordion() {
+                const accordionElem = document.getElementById("accordion");
+                var allPanelElems = accordionElem.querySelectorAll(".panel");
+                for (var i = 0, len = allPanelElems.length; i < len; i++) {
+                    allPanelElems[i].addEventListener("click", handlePanelClick);
+                }
+                showPanel(allPanelElems[0])
+            }
+
+
+            console.log(content);
+
+            const editor = this.expressionEditor;
+            if(this.expressionDebugOverlay) {
+                editor.removeContentWidget(this.expressionDebugOverlay);
+            }
+
+            this.expressionDebugOverlay = {
+                domNode: null,
+                allowEditorOverflow: true,
+                getId: function() {
+                    return 'my.content.widget';
+                },
+                getDomNode: function() {
+                    if (!this.domNode) {
+                        this.domNode = document.createElement('div');
+                        this.domNode.className += "debugPopup";
+                        this.domNode.innerHTML = content;
+                    }
+                    console.log(this.domNode);
+                    return this.domNode;
+                },
+                getPosition: function() {
+                    console.log('getPosition', position);
+                    return {
+                        position: {
+                            lineNumber: position.lineNumber,
+                            column: position.column
+                        },
+                        // preference: [editor.ContentWidgetPositionPreference.BELOW, editor.ContentWidgetPositionPreference.ABOVE]
+                        preference: [2, 1]
+                    };
+                }
+            };
+            editor.addContentWidget(this.expressionDebugOverlay);
+            initAccordion();
+
+        } else if(event.target.type !== 9 && this.expressionDebugOverlay) {
+            this.expressionEditor.removeContentWidget(this.expressionDebugOverlay);
+        }
+
+    }
+
+    expressionMouseMoveHandler(event) {
+        let expr;
+        if(event.target.type === 9) {
+            // popup
+            const id = event.target.element.id;
+            if(id.startsWith('res')) {
+                const jsonata_id = Number.parseInt(id.substring(3));
+                if (this.debugFocus !== jsonata_id) {
+                    this.debugFocus = jsonata_id;
+                    console.log(id, jsonata_id);
+                    this.inputHighligher.clearMarkers();
+                    this.resultsHighligher.clearMarkers();
+                    this.highlightSourceAndTargetById(jsonata_id);
+                }
+                return;
+            } else if(id.startsWith('expr')) {
+                console.log(event.target.element.id);
+                const index = Number.parseInt(id.substring(4));
+                expr = this.debugExpressionList[index];
+            }
+        } else {
+            const position = event.target.position;
+            if (position) {
+                if (!(this.expressionMousePosition.lineNumber === position.lineNumber
+                  && this.expressionMousePosition.column === position.column)) {
+                    this.expressionMousePosition = position;
+                    const index = this.positionToIndex(position, this.state.jsonata) + 1;
+
+                    console.log(position, index);
+
+                    const exprs = Array.from(debugEventGroups.keys())
+                      .filter(expr => expr.span && index >= expr.span.start && index <= expr.span.end)
+                      .sort((a, b) => (a.span.end - a.span.start) - (b.span.end - b.span.start));
+                    console.log(exprs);
+                    if (exprs.length > 0) {
+                        expr = exprs[0];
+                    }
+                }
+            }
+        }
+        if(expr) {
+            console.log('Expr Marker: ', expr);
+            this.clearMarkers();
+            this.expressionHighligher.addMarker(expr.span.start + 1, expr.span.end + 1);
+            debugEventGroups.get(expr)
+              .forEach(item => {
+                  if (item.result && typeof item.result._jsonata_id === 'number') {
+                      this.highlightSourceAndTargetById(item.result._jsonata_id);
+                  }
+              });
+        }
+    }
+
+    resultsDebugHandler(event) {
+        const position = event.target.position;
+        const index = this.positionToIndex(position, this.state.result);
+        this.clearMarkers();
+        for (let i = 0; i < debugResultsIndex.length; i++) {
+            const item = debugResultsIndex[i];
+            if (index >= item.target.start && index <= item.target.end) {
+                const source = debugInputIndex[item.sourceId];
+                if(source) {
+                    this.inputHighligher.addMarker(source.start, source.end);
+                }
+                this.resultsHighligher.addMarker(item.target.start, item.target.end);
+                this.highlightExpressionById(item.sourceId);
+                return;
+            }
+        }
+    }
+
+    jsonataHoverProvider(document, position, token) {
+        const index = this.positionToIndex(position, this.state.jsonata) + 1;
+        const exprs = Array.from(debugEventGroups.keys())
+          .filter(expr => expr.span && index >= expr.span.start && index <= expr.span.end)
+          .sort((a, b) => (a.span.end - a.span.start) - (b.span.end - b.span.start));
+        const contents = exprs.map(expr => {
+            return {value:
+                '[link](ref)\n' +
+                '**`'
+                + this.state.jsonata.substring(expr.span.start, expr.span.end)
+                + '`**\n- `'
+                + debugEventGroups.get(expr).map(item => JSON.stringify(item.result)).join('`\n- `')
+                + '`'
+            }
+        });
+        console.log(contents);
+        return {
+            range: new this.monaco.Range(1, 1, document.getLineCount(), document.getLineMaxColumn(document.getLineCount())),
+            contents: contents
+        };
+    }
+
+    positionToIndex(position, buffer) {
+        let index = 0, line = 1;
+        while (line < position.lineNumber && index < buffer.length) {
+            index = buffer.indexOf('\n', index) + 1;
+            line++;
+        }
+        index += position.column - 1;
+        return index;
     }
 
     onChangeData(newValue, e) {
         this.setState({json: newValue});
-        console.log('onChangeData', newValue, e);
         clearTimeout(this.timer);
         this.timer = setTimeout(this.eval.bind(this), 500);
         this.clearMarkers();
@@ -164,7 +414,6 @@ class Exerciser extends React.Component {
 
     onChangeExpression(newValue, e) {
         this.setState({jsonata: newValue});
-        console.log('onChangeExpression', newValue, e);
         clearTimeout(this.timer);
         this.timer = setTimeout(this.eval.bind(this), 500);
         this.clearMarkers();
@@ -176,7 +425,6 @@ class Exerciser extends React.Component {
     }
 
     changeVersion(event) {
-        console.log(event.target.value);
         this.loadJSONata(event.target.value, false);
         this.timer = setTimeout(this.eval.bind(this), 100);
         this.clearMarkers();
@@ -206,9 +454,7 @@ class Exerciser extends React.Component {
 
 
     changeSample(event) {
-        console.log(event.target.value);
         const data = sample[event.target.value];
-        console.log(data);
         this.setState({
             json: JSON.stringify(data.json, null, 2),
             jsonata: data.jsonata
@@ -227,16 +473,19 @@ class Exerciser extends React.Component {
         }
 
         try {
-            input = JSON.parse(this.state.json);
+            //input = JSON.parse(this.state.json);
+            const source = jsonparse.parse(this.state.json);
+            input = source.value;
+            debugInputIndex = source.idIndex;
+            console.log(debugInputIndex);
         } catch (err) {
             console.log(err);
             this.setState({result: 'ERROR IN INPUT DATA: ' + err.message});
             const pos = err.message.indexOf('at position ');
-            console.log('pos=', pos);
             if(pos !== -1) {
                 console.log(err);
                 const start = parseInt(err.message.substr(pos+12))+1;
-                this.errorMarker(start, start + 1, this.jsonEditor, this.state.json);
+                this.inputErrorHighligher.addMarker(start, start + 1);
             }
             return;
         }
@@ -251,37 +500,31 @@ class Exerciser extends React.Component {
             console.log(err);
             const end = err.position + 1;
             const start = end - (err.token ? err.token.length : 1);
-            this.errorMarker(start, end, this.jsonataEditor, this.state.jsonata);
+            this.expressionErrorHighligher.addMarker(start, end);
         }
     }
 
-    errorMarker(start, end, editor, buffer) {
-        const resolve = offset => {
-            let line = 1;
-            let column = 1;
-            let position = 1;
-            while (position < offset) {
-                if (buffer.charAt(position) === '\n') {
-                    line++;
-                    column = 0;
-                } else {
-                    column++;
-                }
-                position++;
-            }
-            return {line, column};
-        };
-        const from = resolve(start);
-        const to = resolve(end);
-        editor.decorations = editor.deltaDecorations(editor.decorations, [
-            { range: new this.monaco.Range(from.line, from.column, to.line, to.column), options: { inlineClassName: 'jsonataErrorMarker' }},
-            { range: new this.monaco.Range(from.line,1,to.line,1), options: { isWholeLine: true, linesDecorationsClassName: 'jsonataErrorMargin' }},
-        ]);
+    highlightSource(result) {
+        const expr = window.jsonata('$.**[]');
+        const content = expr.evaluate(result);
+        if(Array.isArray(content)) {
+            content
+              .filter(val => typeof val === 'object' && val !== null && typeof val._jsonata_id === 'number')
+              .forEach(val => {
+                  const source = debugInputIndex[val._jsonata_id];
+                  if(source) {
+                      this.inputHighligher.addMarker(source.start, source.end);
+                  }
+              })
+        }
     }
 
     clearMarkers() {
-        this.jsonataEditor.decorations = this.jsonataEditor.deltaDecorations(this.jsonataEditor.decorations, []);
-        this.jsonEditor.decorations = this.jsonEditor.deltaDecorations(this.jsonEditor.decorations, []);
+        this.expressionHighligher.clearMarkers();
+        this.inputHighligher.clearMarkers();
+        this.resultsHighligher.clearMarkers();
+        this.inputErrorHighligher.clearMarkers();
+        this.expressionErrorHighligher.clearMarkers();
     }
 
     evalJsonata(input) {
@@ -298,17 +541,88 @@ class Exerciser extends React.Component {
             this.timeboxExpression(expr, 1000, 500);
         }
 
-        let pathresult = expr.evaluate(input);
+        //let pathresult = expr.evaluate(input);
+        debugEventGroups = new Map();
+        debugEvents = [];
+
+        const debug = expr.debug(input);
+        while (!debug.done()) {
+            const info = debug.value();
+            let result = info.result;
+            if(result && typeof result._jsonata_id === 'undefined') {
+                result = this.wrapValue(result);
+                info.result = result;
+            }
+            if(info.expr) {
+                if(debugEventGroups.get(info.expr)) {
+                    debugEventGroups.get(info.expr).push(info)
+                } else {
+                    debugEventGroups.set(info.expr, [info]);
+                }
+            }
+            debugEvents.push({
+                position: {
+                    start: info.expr.span ? info.expr.span.start + 1 : info.expr.position - (info.expr.value ? info.expr.value.length : 0) + 1,
+                    end: info.expr.span ? info.expr.span.end + 1 : info.expr.position + 1
+                },
+                result: info.result,
+                expr: info.expr,
+                context: info.input._jsonata_id
+            });
+            debug.step(result);
+        }
+        // table.forEach((value, key) => {
+        //     debugEvents.push({
+        //         position: {
+        //             start: key.span ? key.span.start + 1 : key.position - (key.value ? key.value.length : 0) + 1,
+        //             end: key.span ? key.span.end + 1 : key.position + 1
+        //         },
+        //         results: value.map(val => val.result)
+        //     });
+        // });
+        console.log(debugEvents);
+
+        let pathresult = debug.value();
+
+        this.highlightSource(pathresult);
         if (typeof pathresult === 'undefined') {
             pathresult = '** no match **';
         } else {
-            pathresult = JSON.stringify(pathresult, function (key, val) {
-                return (typeof val !== 'undefined' && val !== null && val.toPrecision) ? Number(val.toPrecision(13)) :
-                  (val && (val._jsonata_lambda === true || val._jsonata_function === true)) ? '{function:' + (val.signature ? val.signature.definition : "") + '}' :
-                    (typeof val === 'function') ? '<native function>#' + val.length  : val;
-            }, 2);
+            const ser = jsonparse.stringify(pathresult);
+            pathresult = ser.output;
+            debugResultsIndex = ser.metadata;
+            // pathresult = JSON.stringify(pathresult, function (key, val) {
+            //     return (typeof val !== 'undefined' && val !== null && val.toPrecision) ? Number(val.toPrecision(13)) :
+            //       (val && (val._jsonata_lambda === true || val._jsonata_function === true)) ? '{function:' + (val.signature ? val.signature.definition : "") + '}' :
+            //         (typeof val === 'function') ? '<native function>#' + val.length  : val;
+            // }, 2);
         }
         return pathresult;
+    }
+
+    wrapValue(value) {
+        let result = value;
+        switch(typeof value) {
+            case 'string':
+                result = new String(value);
+                break;
+            case 'number':
+                result = new Number(value);
+                break;
+            case 'boolean':
+                result = new Boolean(value);
+                break;
+            default: {
+                result = value;
+            }
+        }
+        if(result) {
+            Object.defineProperty(result, '_jsonata_id', {
+                value: debugInputIndex.length
+            });
+            debugInputIndex.push(result);
+        }
+        return result;
     }
 
     timeboxExpression(expr, timeout, maxDepth) {
@@ -366,7 +680,6 @@ class Exerciser extends React.Component {
         //     body.error = jsonataError;
         // }
 
-        console.log("save:", body);
         const url = baseUri + 'save';
 
         fetch(url, {
@@ -376,9 +689,7 @@ class Exerciser extends React.Component {
             },
             body: JSON.stringify(body)})
           .then(res => res.json())
-          .then(
-            response => {
-            console.log(response);
+          .then(response => {
             const location = "https://try.jsonata.org/" + response.id;
             const msg = 'Share this link: <a href="' + location + '">' + location + '</a>';
             document.getElementById("share-msg").innerHTML = msg;
@@ -392,7 +703,6 @@ class Exerciser extends React.Component {
         let email;
         try {
             email = document.getElementById("slack-email").value;
-            console.log(email)
         } catch(err) {}
         const body = {
             email: email,
@@ -407,14 +717,11 @@ class Exerciser extends React.Component {
             },
             body: JSON.stringify(body)})
           .then(res => res.json())
-          .then(
-            response => {
-            console.log(response);
+          .then(response => {
             document.getElementById("slack-title").innerHTML = 'Invitation sent!';
             document.getElementsByClassName("verify")[0].style.display = 'none';
             //document.getElementsByClassName("verify")[1].style.display = 'none';
         }).catch(error => {
-            console.error(error);
             document.getElementById("slack-title").innerHTML = 'Error: ' + error.message;
         });
     }
@@ -496,6 +803,7 @@ class Exerciser extends React.Component {
                           readOnly: true,
                           extraEditorClassName: 'result-pane'
                       }}
+                      editorDidMount={this.resultsEditorDidMount.bind(this)}
                     />
                 </SplitPane>
             </SplitPane>

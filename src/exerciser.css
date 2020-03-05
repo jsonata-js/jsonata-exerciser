@@ -162,6 +162,29 @@ textarea, .pane {
     margin-left: 3px;
 }
 
+.jsonataDebugMarker {
+    background: rgba(40, 81, 84, 0.2);
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-weight: bold;
+}
+
+.jsonataDebugMargin {
+    background: #285154;
+    width: 5px !important;
+    margin-left: 3px;
+}
+
+.debugPopup {
+    background: whitesmoke;
+    border: 1px black solid;
+    padding: 3px;
+    font-family: Menlo, Monaco, "Courier New", monospace;
+    z-index: 20;
+    overflow: auto;
+    max-width: 600px !important;
+}
+
 .label {
     position: absolute;
     top: 20px;
@@ -343,3 +366,51 @@ input {
 .ReactModal__Overlay {
     z-index: 15;
 }
+
+
+/** This class will hide all the body be default **/
+#accordion .body{
+    display : none;
+    padding : 10px;
+    white-space: nowrap;
+}
+
+/** This class will show the body if it has a parent with active       class
+**/
+#accordion .active .body {
+    display : block;
+}
+
+#accordion .panel{
+    border : solid 1px #D6D6D6;
+    margin:5px;
+/*    padding : 5px; */
+    border-radius : 2px;
+}
+
+#accordion .header {
+    background-color: rgba(40, 81, 84, 0.2);
+    padding: 4px;
+}
+
+#accordion .active .header, #accordion .header:hover {
+    background-color: rgba(40, 81, 84, 0.6);
+}
+
+#accordion .header:before {
+    content: "\02795";
+}
+
+#accordion .active .header:before {
+    content: "\2796";
+}
+
+#accordion ul {
+    margin: 0px;
+    padding-left: 13px;
+}
+
+#accordion li:hover {
+    background-color: rgba(40, 81, 84, 0.2);;
+}
+
