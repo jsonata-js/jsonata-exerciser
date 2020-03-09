@@ -72,6 +72,12 @@ textarea, .pane {
     font-weight: normal;
     color: white;
     background-color: #285154;
+    overflow: auto;
+}
+
+#banner-strip {
+    display: flex;
+    justify-content: space-between;
 }
 
 #logo {
@@ -85,7 +91,7 @@ textarea, .pane {
 
 .bannerpart {
     float: left;
-    width: 24%;
+    width: 96%;
     position: relative;
     top: 50%;
     transform: translateY(-50%);
@@ -103,21 +109,8 @@ textarea, .pane {
     padding-right: 10px;
 }
 
-#banner3 {
-    text-align: right;
-}
-
-#banner3 select {
-    font-family: "Source Sans Pro",  sans-serif;
-    font-weight: lighter;
-    color: white;
-    background: transparent;
-    border-width: 1px;
-    border-color: white;
-    font-size: smaller;
-    height: 25px;
-    padding: 5px; /* If you add too much padding here, the options won't show in IE */
-    width: 100px;
+#banner1 {
+    padding-top: 5px;
 }
 
 #banner4 {

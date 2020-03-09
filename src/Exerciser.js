@@ -433,18 +433,18 @@ class Exerciser extends React.Component {
             <header className="App-header">
                 <div id="banner">
                     <div id="logo"><a href="http://jsonata.org"><img src={logo} alt={"JSONata"}/></a></div>
-                    <div id="banner1" className="bannerpart">JSONata Exerciser</div>
-                    <div id="banner2" className="bannerpart">&nbsp;</div>
-                    <div id="banner3" className="bannerpart">&nbsp;</div>
-                    <div id="banner4" className="bannerpart">
-                        <a href="#share" onClick={this.handleOpenSaveModal.bind(this)}><img src={share} alt="Save and Share"/></a>
-                        <a href="http://docs.jsonata.org"><img src={docs} alt="Documentation"/></a>
-                        <a
-                          href="http://twitter.com/intent/tweet?status=JSONata:  The JSON query and transformation language.+http://jsonata.org"><img
-                          id="t-icon" src={twitter} alt={"Twitter"}/></a>
-                        <a href="#slack" onClick={this.handleOpenSlackModal.bind(this)}><img src={slack} alt={"Join us on Slack"}/></a>
-                        <a href="http://stackoverflow.com/search?q=JSONata"><img src={stackoverflow} alt={"StackOverflow"}/></a>
-                        <a href="https://github.com/jsonata-js/jsonata"><img src={github} alt={"GitHub"}/></a>
+                    <div id="banner-strip" className="bannerpart">
+                        <div id="banner1">JSONata Exerciser</div>
+                        <div id="banner4">
+                            <a href="#share" onClick={this.handleOpenSaveModal.bind(this)}><img src={share} alt="Save and Share"/></a>
+                            <a href="http://docs.jsonata.org"><img src={docs} alt="Documentation"/></a>
+                            <a
+                              href="http://twitter.com/intent/tweet?status=JSONata:  The JSON query and transformation language.+http://jsonata.org"><img
+                              id="t-icon" src={twitter} alt={"Twitter"}/></a>
+                            <a href="#slack" onClick={this.handleOpenSlackModal.bind(this)}><img src={slack} alt={"Join us on Slack"}/></a>
+                            <a href="http://stackoverflow.com/search?q=JSONata"><img src={stackoverflow} alt={"StackOverflow"}/></a>
+                            <a href="https://github.com/jsonata-js/jsonata"><img src={github} alt={"GitHub"}/></a>
+                        </div>
                     </div>
                 </div>
             </header>
