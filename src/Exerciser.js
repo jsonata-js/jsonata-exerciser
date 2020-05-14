@@ -465,6 +465,7 @@ class Exerciser extends React.Component {
                         <option value="Address">Address</option>
                         <option value="Schema">Schema</option>
                         <option value="Library">Library</option>
+                        <option value="Posts">Posts</option>
                     </select>
                 </div>
                 <SplitPane split="horizontal" minSize={50} defaultSize={170}>
