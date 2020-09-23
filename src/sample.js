@@ -79,7 +79,8 @@ export default {
                 ]
             }
         },
-        jsonata: "$sum(Account.Order.Product.(Price * Quantity))"
+        jsonata: "$sum(Account.Order.Product.(Price * Quantity))",
+        bindings: `{\n  constant: 5,\n  divideBy100: (val) => val/100,\n  addConstant: (val) => val + 10\n}`
     },
     Address: {
         json: {

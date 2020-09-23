@@ -6,6 +6,7 @@
 
 import React, {Component} from 'react';
 import './exerciser.css';
+import './externalLibsComponent.css';
 import {BrowserRouter, Route} from 'react-router-dom';
 import Exerciser from './Exerciser';
 class App extends Component {
