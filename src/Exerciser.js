@@ -122,6 +122,7 @@ class Exerciser extends React.Component {
         console.log(this.props.data);
         if (this.props.data) {
             this.setState({ json: 'Loading...', jsonata: 'Loading...' });
+            const self = this;
             // load the data
             fetch(baseUri + 'shared?id=' + this.props.data)
                 .then(res => res.json())
@@ -132,13 +133,13 @@ class Exerciser extends React.Component {
                     ([result, externalLibs]) => {
                         console.log(result);
                         this.setState({
-                            json: JSON.stringify(result.json, null, 2),
+                            json: (typeof result.json === 'undefined') ? '' : JSON.stringify(result.json, null, 2),
                             jsonata: result.jsonata,
                             bindings: result.bindings,
                             externalLibs: externalLibs,
                             result: ''
                         });
-                        this.eval();
+                        self.eval();
                     },
                     error => {
                         console.log(error);
@@ -175,7 +176,6 @@ class Exerciser extends React.Component {
     }
 
     jsonEditorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
         this.jsonEditor = editor;
         editor.decorations = [];
         //editor.focus();
@@ -188,7 +188,6 @@ class Exerciser extends React.Component {
     }
 
     jsonataEditorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
         this.monaco = monaco;
         this.jsonataEditor = editor;
         editor.decorations = [];
@@ -215,8 +214,7 @@ class Exerciser extends React.Component {
     }
 
     onChangeData(newValue, e) {
-        this.setState({ json: newValue });
-        console.log('onChangeData', newValue, e);
+        this.setState({json: newValue});
         clearTimeout(this.timer);
         this.timer = setTimeout(this.eval.bind(this), 500);
         this.clearMarkers();
@@ -230,8 +228,7 @@ class Exerciser extends React.Component {
     }
 
     onChangeExpression(newValue, e) {
-        this.setState({ jsonata: newValue });
-        console.log('onChangeExpression', newValue, e);
+        this.setState({jsonata: newValue});
         clearTimeout(this.timer);
         this.timer = setTimeout(this.eval.bind(this), 500);
         this.clearMarkers();
@@ -251,7 +248,6 @@ class Exerciser extends React.Component {
     }
 
     changeVersion(event) {
-        console.log(event.target.value);
         this.loadJSONata(event.target.value, false);
         this.timer = setTimeout(this.eval.bind(this), 100);
         this.clearMarkers();
@@ -280,9 +276,7 @@ class Exerciser extends React.Component {
 
 
     changeSample(event) {
-        console.log(event.target.value);
         const data = sample[event.target.value];
-        console.log(data);
         this.setState({
             json: JSON.stringify(data.json, null, 2),
             jsonata: data.jsonata,
@@ -302,7 +296,11 @@ class Exerciser extends React.Component {
         }
 
         try {
-            input = JSON.parse(this.state.json);
+            if (typeof this.state.json !== 'undefined' && this.state.json !== '') {
+                input = JSON.parse(this.state.json);
+            } else {
+                input = undefined;
+            }
         } catch (err) {
             console.log(err);
             this.setState({ result: 'ERROR IN INPUT DATA: ' + err.message });
@@ -336,12 +334,13 @@ class Exerciser extends React.Component {
         }
 
         try {
-            if (this.state.jsonata !== "") {
+            if (this.state.jsonata !== '') {
                 const allBindings = { ...bindings, ...externalLibs };
-                console.log({ allBindings })
                 jsonataResult = this.evalJsonata(input, allBindings);
-                this.setState({ result: jsonataResult });
+            } else {
+                jsonataResult = '^^ Enter a JSONata expression in the box above ^^'
             }
+            this.setState({result: jsonataResult});
         } catch (err) {
             this.setState({ result: err.message || String(err) });
             console.log(err);
