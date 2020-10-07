@@ -75,6 +75,23 @@ textarea, .pane {
     overflow: auto;
 }
 
+
+.pane-heading {
+    height: 20px;
+    width: 100%;
+    font-family: "Source Sans Pro",  sans-serif;
+    font-weight: normal;
+    font-size: medium;
+    color: white;
+    background-color: #285154;
+    overflow: hidden;
+    text-align: left;
+    padding-bottom: 5px;
+    padding-left: 3px;
+    cursor: pointer;
+}
+
+
 #banner-strip {
     display: flex;
     justify-content: space-between;
@@ -184,6 +201,20 @@ textarea, .pane {
     right: 20px;
     height: 17px;
     z-index: 10;
+}
+#add-libraries {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    z-index: 10;
+    background-color: #285154;
+    color: #ffffff;
+    border: solid 0;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    outline: none;
+    font-size: 14px;
 }
 
 #sample-data, #version-select {
@@ -342,4 +373,8 @@ input {
 
 .ReactModal__Overlay {
     z-index: 15;
+}
+
+.w-full{
+    width: 100%;
 }
