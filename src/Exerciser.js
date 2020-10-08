@@ -4,6 +4,8 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
+import {DateTime} from 'luxon';
+import * as moment from 'moment-timezone';
 import React from 'react';
 import SplitPane from 'react-split-pane'
 import MonacoEditor from 'react-monaco-editor';
@@ -285,6 +287,14 @@ class Exerciser extends React.Component {
 
     evalJsonata(input) {
         const expr = window.jsonata(this.state.jsonata);
+
+        expr.assign('DateTime_fromFormat', (arg1, arg2, arg3, arg4) =>
+            DateTime.fromFormat(arg1, arg2, arg3, arg4)
+        );
+
+        expr.assign('moment', (arg1, arg2, arg3, arg4) =>
+            moment(arg1, arg2, arg3, arg4)
+        );
 
         expr.assign('trace', function(arg) {
             console.log(arg);
