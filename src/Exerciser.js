@@ -549,7 +549,7 @@ class Exerciser extends React.Component {
             </header>
 
             <SplitPane split="vertical" minSize={100} defaultSize={'50%'}>
-                <SplitPane split="horizontal" minSize={100} defaultSize={this.state.panelStates.bindings === "visible" ? '30%' : '20px'} primary="second" paneStyle={{ transition: "height 200ms ease" }}>
+                <SplitPane split="horizontal" minSize={100} size={this.state.panelStates.bindings === "visible" ? '30%' : '20px'} primary="second" allowResize={this.state.panelStates.bindings === "visible"}>
                     <div className="pane">
                         <MonacoEditor
                             language="json"
