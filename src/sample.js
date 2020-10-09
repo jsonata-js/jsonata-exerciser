@@ -4,6 +4,8 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
+const defaultBindingsText = `// Define bindings as properties of the below object\n// Its possible to write any javascript expression here that evaluates to an object\n{\n // name: value \n}`;
+
 export default {
     Invoice: {
         json: {
@@ -80,7 +82,7 @@ export default {
             }
         },
         jsonata: "$sum(Account.Order.Product.(Price * Quantity))",
-        bindings: `{\n  constant: 5,\n  divideBy100: (val) => val/100,\n  addConstant: (val) => val + 10\n}`
+        bindings: defaultBindingsText
     },
     Address: {
         json: {
@@ -133,7 +135,8 @@ export default {
         jsonata: `{
   "name": FirstName & " " & Surname,
   "mobile": Phone[type = "mobile"].number
-}`
+}`,
+        bindings: defaultBindingsText
     },
     Schema: {
         json: {
@@ -264,7 +267,8 @@ export default {
                 }
             }
         },
-        jsonata: "**.properties ~> $keys()"
+        jsonata: "**.properties ~> $keys()",
+        bindings: defaultBindingsText
     },
     Library: {
         json: {
@@ -365,6 +369,7 @@ export default {
   'customer': name,
   'book': $B.title,
   'due': $L.return
-}`
+}`,
+        bindings: defaultBindingsText
     }
 }

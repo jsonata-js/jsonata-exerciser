@@ -135,7 +135,7 @@ class Exerciser extends React.Component {
                         this.setState({
                             json: (typeof result.json === 'undefined') ? '' : JSON.stringify(result.json, null, 2),
                             jsonata: result.jsonata,
-                            bindings: result.bindings,
+                            bindings: result.bindings !== undefined ? result.bindings : '',
                             externalLibs: externalLibs,
                             result: ''
                         });
