@@ -9,6 +9,7 @@ export default class ExternalLibsComponent extends Component {
         this.form = React.createRef();
         this.state = {
             loading: false,
+            error:"",
             url: "",
             moduleName: "",
             externalLibs: props.externalLibs
@@ -40,16 +41,25 @@ export default class ExternalLibsComponent extends Component {
 
                 } catch (error) {
                     console.error("Could not load library from " + url)
-                    console.error(error)
+                    console.error(error);
+                    this.setError("Could not load library from " + url, error);
                 }
 
             }).catch((error => {
                 console.error("Could not load library from " + url)
-                console.error(error)
+                console.error(error);
+                this.setError("Could not load library from " + url, error);
             }))
             .finally(() => {
                 this.setState({ loading: false, url: '', moduleName: '' });
             });
+    }
+
+    setError(message, error){
+        this.setState({ error:`${message}\n\n${error}` });
+        setTimeout(() => {
+            this.setState({ error: ""});
+        }, 3000);
     }
 
     removeLibrary(id) {
@@ -83,6 +93,9 @@ export default class ExternalLibsComponent extends Component {
                         <button className="button flex-1" onClick={this.loadLibrary.bind(this)}>Add</button>
                     </div>
                 </form>
+                <div className="error-message">
+                    {this.state.error}
+                </div>
 
                 <div className="loader" style={{ visibility: this.state.loading ? "visible" : "hidden", display: "grid", placeItems: "center" }}>
                     <div className="loader-icon"></div>
