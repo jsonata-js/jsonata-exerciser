@@ -371,5 +371,21 @@ export default {
   'due': $L.return
 }`,
         bindings: defaultBindingsText
+    },
+    Bindings: {
+        json: {
+          "angle": 60
+        },
+        jsonata: `$cosine(angle * $pi/180)
+
+/*
+JSONata can be extended by binding variables to external functions and values.
+Expand the 'Bindings' panel to bind variables to Javascript code for use in your expression.
+This is useful for experimenting with functions that are not built into JSONata.
+*/`,
+        bindings: `{
+  pi: 3.1415926535898,
+  cosine: Math.cos
+}`
     }
 }

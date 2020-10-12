@@ -10,6 +10,8 @@
 function main(params) {
 	return {
 	    json: params.input,
-	    jsonata: params.jsonata
+	    jsonata: params.jsonata,
+		bindings: params.bindings,
+		externalLibs: params.externalLibs
 	};
 }

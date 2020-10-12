@@ -43,7 +43,9 @@ function main(params) {
                         _id: shortid.generate(),
                         timestamp: now.toISOString(),
                         input: params.input,
-                        jsonata: params.jsonata
+                        jsonata: params.jsonata,
+                        bindings: params.bindings,
+                        externalLibs: params.externalLibs
                     };
                     if (params.result) {
                         doc.result = params.result;

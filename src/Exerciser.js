@@ -135,7 +135,7 @@ class Exerciser extends React.Component {
                         this.setState({
                             json: (typeof result.json === 'undefined') ? '' : JSON.stringify(result.json, null, 2),
                             jsonata: result.jsonata,
-                            bindings: result.bindings !== undefined ? result.bindings : '',
+                            bindings: result.bindings !== undefined ? result.bindings : '{\n  // name: value\n}',
                             externalLibs: externalLibs,
                             result: ''
                         });
@@ -566,6 +566,7 @@ class Exerciser extends React.Component {
                             <option value="Address">Address</option>
                             <option value="Schema">Schema</option>
                             <option value="Library">Library</option>
+                            <option value="Bindings">Bindings</option>
                         </select>
                     </div>
                     <div className="w-full">
