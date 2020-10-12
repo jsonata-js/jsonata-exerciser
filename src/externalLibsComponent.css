@@ -31,7 +31,7 @@
 }
 
 .lib-input{
-    margin: 5px
+    margin: 5px 5px 5px 0
 }
 
 .flex-1 {
@@ -83,6 +83,12 @@
     border: solid 5px lightgray;
     border-top-color: green;
     border-radius: 50%;
+}
+.error-message{
+    color: rgb(207, 16, 16);
+    font-size: small;
+    white-space: pre-wrap;
+    margin: 5px;
 }
 
 @keyframes spin {
