@@ -130,7 +130,7 @@ class Exerciser extends React.Component {
                     return Promise.all([Promise.resolve(result), this.getExternalLibsInitialized(result.externalLibs)])
                 })
                 .then(
-                    ([result, externalLibs]) => {
+                    async ([result, externalLibs]) => {
                         console.log(result);
                         this.setState({
                             json: (typeof result.json === 'undefined') ? '' : JSON.stringify(result.json, null, 2),
@@ -139,7 +139,7 @@ class Exerciser extends React.Component {
                             externalLibs: externalLibs,
                             result: ''
                         });
-                        self.eval();
+                        await self.eval();
                     },
                     error => {
                         console.log(error);
@@ -287,7 +287,7 @@ class Exerciser extends React.Component {
         this.clearMarkers();
     }
 
-    eval() {
+    async eval() {
         let input, jsonataResult, bindings;
 
         if (typeof window.jsonata === 'undefined') {
@@ -336,7 +336,7 @@ class Exerciser extends React.Component {
         try {
             if (this.state.jsonata !== '') {
                 const allBindings = { ...bindings, ...externalLibs };
-                jsonataResult = this.evalJsonata(input, allBindings);
+                jsonataResult = await this.evalJsonata(input, allBindings);
             } else {
                 jsonataResult = '^^ Enter a JSONata expression in the box above ^^'
             }
@@ -379,7 +379,7 @@ class Exerciser extends React.Component {
         this.jsonEditor.decorations = this.jsonEditor.deltaDecorations(this.jsonEditor.decorations, []);
     }
 
-    evalJsonata(input, bindings) {
+    async evalJsonata(input, bindings) {
         const expr = window.jsonata(this.state.jsonata);
 
         expr.assign('trace', function (arg) {
@@ -393,7 +393,7 @@ class Exerciser extends React.Component {
             this.timeboxExpression(expr, 1000, 500);
         }
 
-        let pathresult = expr.evaluate(input, bindings);
+        let pathresult = await expr.evaluate(input, bindings);
         if (typeof pathresult === 'undefined') {
             pathresult = '** no match **';
         } else {
