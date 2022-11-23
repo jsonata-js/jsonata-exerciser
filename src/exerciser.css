@@ -378,3 +378,11 @@ input {
 .w-full{
     width: 100%;
 }
+
+.find-part{
+    margin: -3px 0 0 17px !important;
+}
+
+.toggle {
+    top: -5px !important;
+}
