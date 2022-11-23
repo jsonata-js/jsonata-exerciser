@@ -181,8 +181,8 @@ textarea, .pane {
 
 .label {
     position: absolute;
-    top: 20px;
-    right: 40px;
+    top: 7px;
+    right: 41px;
     border: thin;
     font-family: "Source Sans Pro",  sans-serif;
     font-weight: lighter;
