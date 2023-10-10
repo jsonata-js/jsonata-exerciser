@@ -8,5 +8,5 @@
   *
   */
 function main(params) {
-	return { docid: params.id };
+	return { dbname: 'exerciser', docid: params.id };
 }
