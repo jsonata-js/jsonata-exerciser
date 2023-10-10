@@ -4,7 +4,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "predeploy": "ibmcloud fn package update jsonata --param SLACK_TOKEN $SLACK_TOKEN",
-    "deploy": "ibmcloud fn action update jsonata/slack-invite dist/bundle.js --kind nodejs:10 --web true"
+    "deploy": "ibmcloud fn action update /_/slack-invite dist/bundle.js --kind nodejs:20 --web true"
   },
   "dependencies": {
     "querystring": "^0.2.0",

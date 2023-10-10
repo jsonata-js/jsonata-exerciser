@@ -24,7 +24,7 @@ import ExternalLibsComponent, { getLibraryHandle } from './externalLibsComponent
 Modal.setAppElement('#root');
 
 const recaptchaRef = React.createRef();
-const baseUri = 'https://c40c296d.us-south.apigw.appdomain.cloud/api/';
+const baseUri = 'https://us-south.functions.appdomain.cloud/api/v1/web/04d6b400-5947-46c6-ae3e-ebdf4a7056de/default/';
 
 const customStyles = {
     content: {
@@ -97,7 +97,7 @@ class Exerciser extends React.Component {
 
     componentDidMount() {
         this.loadJSONata();
-        fetch(baseUri + 'versions')
+        fetch(baseUri + 'jsonata-versions.json')
             .then(res => res.json())
             .then(
                 result => {
@@ -124,7 +124,7 @@ class Exerciser extends React.Component {
             this.setState({ json: 'Loading...', jsonata: 'Loading...' });
             const self = this;
             // load the data
-            fetch(baseUri + 'shared?id=' + this.props.data)
+            fetch(baseUri + 'get-shared.json?id=' + this.props.data)
                 .then(res => res.json())
                 .then(result =>{
                     return Promise.all([Promise.resolve(result), this.getExternalLibsInitialized(result.externalLibs)])
@@ -497,7 +497,7 @@ class Exerciser extends React.Component {
             recaptcha: resp
         };
 
-        const url = baseUri + 'slack';
+        const url = baseUri + 'slack-invite';
         fetch(url, {
             method: 'POST',
             headers: {

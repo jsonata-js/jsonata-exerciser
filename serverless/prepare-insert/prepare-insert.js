@@ -53,7 +53,7 @@ function main(params) {
                     if (params.error) {
                         doc.error = params.error;
                     }
-                    return resolve({doc: doc});
+                    return resolve({ dbname: 'exerciser', doc: doc });
                 } else {
                     // failed the reCaptcha challenge
                     return reject({ statusCode: 400, msg: 'Failed the robot challenge!' });
