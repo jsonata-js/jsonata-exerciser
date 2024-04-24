@@ -24,7 +24,6 @@ import ExternalLibsComponent, { getLibraryHandle } from './externalLibsComponent
 Modal.setAppElement('#root');
 
 const recaptchaRef = React.createRef();
-const baseUri = 'https://us-south.functions.appdomain.cloud/api/v1/web/04d6b400-5947-46c6-ae3e-ebdf4a7056de/default/';
 
 const customStyles = {
     content: {
@@ -97,7 +96,7 @@ class Exerciser extends React.Component {
 
     componentDidMount() {
         this.loadJSONata();
-        fetch(baseUri + 'jsonata-versions.json')
+        fetch('https://jsonata-versions.1g5lolddjght.us-east.codeengine.appdomain.cloud')
             .then(res => res.json())
             .then(
                 result => {
@@ -124,7 +123,7 @@ class Exerciser extends React.Component {
             this.setState({ json: 'Loading...', jsonata: 'Loading...' });
             const self = this;
             // load the data
-            fetch(baseUri + 'get-shared.json?id=' + this.props.data)
+            fetch('https://get-shared.1g5lolddjght.us-east.codeengine.appdomain.cloud?id=' + this.props.data)
                 .then(res => res.json())
                 .then(result =>{
                     return Promise.all([Promise.resolve(result), this.getExternalLibsInitialized(result.externalLibs)])
@@ -464,7 +463,7 @@ class Exerciser extends React.Component {
         // }
 
         console.log("save:", body);
-        const url = baseUri + 'save';
+        const url = 'https://save.1g5lolddjght.us-east.codeengine.appdomain.cloud';
 
         fetch(url, {
             method: 'POST',
@@ -497,7 +496,7 @@ class Exerciser extends React.Component {
             recaptcha: resp
         };
 
-        const url = baseUri + 'slack-invite';
+        const url = 'https://slack-invite.1g5lolddjght.us-east.codeengine.appdomain.cloud';
         fetch(url, {
             method: 'POST',
             headers: {

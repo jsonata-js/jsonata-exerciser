@@ -1,6 +1,6 @@
 var path = require('path');
 module.exports = {
-  entry: './slack-invite.js',
+  entry: './save.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js'

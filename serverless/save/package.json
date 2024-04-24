@@ -1,10 +1,10 @@
 {
-  "name": "prepare-insert",
+  "name": "save",
   "main": "dist/bundle.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "predeploy": "ibmcloud fn package update jsonata --param CAPTCHA_SECRET $CAPTCHA_SECRET",
-    "deploy": "ibmcloud fn action update /_/prepare-insert dist/bundle.js --kind nodejs:20"
+    "deploy": "ibmcloud fn action update /_/save dist/bundle.js --kind nodejs:20"
   },
   "dependencies": {
     "querystring": "^0.2.0",
