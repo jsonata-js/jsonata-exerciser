@@ -181,8 +181,8 @@ textarea, .pane {
 
 .label {
     position: absolute;
-    top: 20px;
-    right: 40px;
+    top: 7px;
+    right: 41px;
     border: thin;
     font-family: "Source Sans Pro",  sans-serif;
     font-weight: lighter;
@@ -377,4 +377,12 @@ input {
 
 .w-full{
     width: 100%;
+}
+
+.find-part{
+    margin: -3px 0 0 17px !important;
+}
+
+.toggle {
+    top: -5px !important;
 }
