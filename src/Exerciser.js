@@ -432,11 +432,11 @@ class Exerciser extends React.Component {
         };
 
         // register callbacks
-        expr.assign('__evaluate_entry', function (expr, input, environment) {
+        expr.assign(Symbol.for('jsonata.__evaluate_entry'), function (expr, input, environment) {
             depth++;
             checkRunnaway();
         });
-        expr.assign('__evaluate_exit', function (expr, input, environment, result) {
+        expr.assign(Symbol.for('jsonata.__evaluate_exit'), function (expr, input, environment, result) {
             depth--;
             checkRunnaway();
         });
