@@ -59,7 +59,7 @@
     "resolve": "1.8.1",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.0",
-    "terser-webpack-plugin": "1.1.0",
+    "terser-webpack-plugin": "1.4.5",
     "url-loader": "1.1.1",
     "utf-8-validate": "^5.0.2",
     "webpack": "4.19.1",
