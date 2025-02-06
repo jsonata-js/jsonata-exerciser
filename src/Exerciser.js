@@ -1,11 +1,11 @@
 /**
- * © Copyright IBM Corp. 2016, 2020 All Rights Reserved
+ * © Copyright IBM Corp. 2016, 2025 All Rights Reserved
  *   Project name: JSONata
  *   This project is licensed under the MIT License, see LICENSE
  */
 
 import React from 'react';
-import SplitPane from 'react-split-pane'
+import { SplitPane } from '@rexxars/react-split-pane'
 import MonacoEditor from 'react-monaco-editor';
 import format from './images/format.png';
 import sample from './sample';
@@ -475,7 +475,7 @@ class Exerciser extends React.Component {
             });
             console.log(resp);
             const response = await resp.json();
-            if (resp.status == 201) {
+            if (resp.status === 201) {
                 const location = "https://try.jsonata.org/" + response.id;
                 const msg = 'Share this link: <a href="' + location + '">' + location + '</a>';
                 document.getElementById("share-msg").innerHTML = msg;

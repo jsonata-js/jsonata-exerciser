@@ -1,31 +1,32 @@
 /**
- * © Copyright IBM Corp. 2020 All Rights Reserved
+ * © Copyright IBM Corp. 2016, 2025 All Rights Reserved
  *   Project name: JSONata
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-import React, {Component} from 'react';
 import './exerciser.css';
 import './externalLibsComponent.css';
-import {BrowserRouter, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, useParams} from 'react-router';
 import Exerciser from './Exerciser';
-class App extends Component {
 
-    loadData({match}) {
-        return <Exerciser data={match ? match.params.id : null}/>
-    }
+function Data({match}) {
+  let params = useParams();
+  return <Exerciser data={params ? params.id : null}/>
+}
 
-    render() {
-        return (
-          <BrowserRouter basename={process.env.PUBLIC_URL}>
-              <div className="App">
-                  <main>
-                      <Route path="/:id" children={this.loadData}/>
-                  </main>
-              </div>
-          </BrowserRouter>
-        );
-    }
+function App() {
+  return (
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <div className="App">
+        <main>
+          <Routes>
+            <Route path="/" element={<Data/>}/>
+            <Route path="/:id" element={<Data/>}/>
+          </Routes>
+        </main>
+    </div>
+</BrowserRouter>
+);
 }
 
 export default App;
